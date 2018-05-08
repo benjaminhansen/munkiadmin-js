@@ -6,5 +6,7 @@ use Illuminate\Http\Request;
 
 class PackagesController extends Controller
 {
-    //
+    public function index() {
+
+    }
 }
