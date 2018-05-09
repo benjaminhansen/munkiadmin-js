@@ -76,23 +76,49 @@ class GetController extends Controller
     }
 
     public function categories($query = null) {
-        $categories = [];
-        $package_plists = $this->packagesInfo(true);
-        foreach($package_plists as $plist) {
-            $contents = $plist['content'];
+        if(is_null($query)) {
+            $categories = [];
+            $package_plists = $this->packagesInfo(true);
+            foreach($package_plists as $plist) {
+                $contents = $plist['content'];
 
-            $obj = new CFPropertyList;
-            $obj->parse($contents);
+                $obj = new CFPropertyList;
+                $obj->parse($contents);
 
-            $category = $obj->getValue(true)->category;
-            if(is_null($category)) {
-                $categories[] = "Unknown";
-            } else {
-                $categories[] = $category->getValue(true);
+                $category = $obj->getValue(true)->category;
+                if(is_null($category)) {
+                    $categories[] = "Uncategorized";
+                } else {
+                    $categories[] = $category->getValue(true);
+                }
             }
+            $categories = array_unique($categories);
+            return array_values($categories);
+        } else {
+            $packages = [];
+
+            $package_plists = $this->packagesInfo(true);
+            foreach($package_plists as $plist) {
+                $contents = $plist['content'];
+
+                $obj = new CFPropertyList;
+                $obj->parse($contents);
+
+                $category = $obj->getValue(true)->category;
+
+                if(is_null($category)) {
+                    if($query == "Unknown") {
+                        $packages[] = $plist;
+                    }
+                } else {
+                    if($query == $category->getValue(true)) {
+                        $packages[] = $plist;
+                    }
+                }
+            }
+
+            return $packages;
         }
-        $categories = array_unique($categories);
-        return array_values($categories);
     }
 
     public function developers($query = null) {

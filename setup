@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+
+$composer = trim(shell_exec("which composer"));
+if($composer == "") {
+    die("composer is required to continue!\n");
+}
+
+$npm = trim(shell_exec("which npm"));
+if($npm == "") {
+    die("npm is required to continue!\n");
+}
+
+$dir = __DIR__;
+
+echo "Copy .env\n";
+$copy_env = file_exists($dir.'/.env') || copy($dir.'/.env.example', $dir.'/.env');
+
+echo "Generate Laravel App Key\n";
+$key_gen = shell_exec("cd $dir && php artisan key:generate");
+
+echo "Install composer dependencies\n";
+$run_composer = shell_exec("cd $dir && composer install");
+
+echo "Install npm dependencies and generate prod files\n";
+$run_npm = shell_exec("cd $dir && npm install && npm run prod");
+
+echo "Regenerate autoload files\n";
+$dump_autoload = shell_exec("cd $dir && composer dump-autoload");
+
+echo "Configuration complete\n";

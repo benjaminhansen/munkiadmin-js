@@ -10417,3 +10417,20 @@ a.text-dark:focus {
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
+body {
+  padding-top: 75px;
+}
+
+.clickable-row:hover,
+button.list-group-item:hover {
+  cursor: pointer;
+}
+
+button.list-group-item {
+  text-align: left;
+}
+
+button.list-group-item:hover {
+  background-color: #f1f1f1;
+}
+

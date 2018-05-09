@@ -21,6 +21,7 @@ Route::group(['prefix' => 'api/v1'], function(){
     Route::get('developers/{query?}', 'Api\\GetController@developers');
 });
 
+Route::get('/', function(){ return redirect('packages'); });
 Route::get('catalogs', 'CatalogsController@index');
 Route::get('packages', 'PackagesController@index');
 Route::get('manifests', 'ManifestsController@index');
