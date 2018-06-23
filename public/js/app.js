@@ -1782,6 +1782,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this3.packages = response.data;
             });
         },
+        getIconPath: function getIconPath(icon) {
+            if (icon != "" && icon != null) {
+                return "/files/icons/" + icon;
+            } else {
+                return "";
+            }
+        },
         viewPackage: function viewPackage(pkg) {
             var contents = this.plistParse(pkg.content);
         },
@@ -55633,7 +55640,17 @@ var render = function() {
                     }
                   },
                   [
-                    _c("td", [_vm._v("icon")]),
+                    _c("td", [
+                      _c("img", {
+                        staticClass: "package-icon",
+                        attrs: {
+                          src: _vm.getIconPath(
+                            _vm.plistParse(pkg.content).icon_name
+                          ),
+                          alt: "icon"
+                        }
+                      })
+                    ]),
                     _vm._v(" "),
                     _c("td", [
                       _vm._v(_vm._s(_vm.plistParse(pkg.content).name))

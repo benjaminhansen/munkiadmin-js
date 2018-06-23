@@ -25,3 +25,5 @@ Route::get('/', function(){ return redirect('packages'); });
 Route::get('catalogs', 'CatalogsController@index');
 Route::get('packages', 'PackagesController@index');
 Route::get('manifests', 'ManifestsController@index');
+
+Route::get('files/{filename?}', 'FilesController@get_file')->where('filename', '(.*)');

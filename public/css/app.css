@@ -10434,3 +10434,11 @@ button.list-group-item:hover {
   background-color: #f1f1f1;
 }
 
+.package-icon {
+  max-width: 75px;
+}
+
+td {
+  vertical-align: middle !important;
+}
+

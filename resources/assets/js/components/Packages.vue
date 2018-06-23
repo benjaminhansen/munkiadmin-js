@@ -34,7 +34,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="pkg in packages" class="clickable-row" @click="viewPackage(pkg)">
-                                <td>icon</td>
+                                <td><img :src="getIconPath(plistParse(pkg.content).icon_name)" class="package-icon" alt="icon" /></td>
                                 <td>{{ plistParse(pkg.content).name }}</td>
                                 <td>{{ plistParse(pkg.content).display_name }}</td>
                                 <td>{{ plistParse(pkg.content).version }}</td>
@@ -114,9 +114,16 @@
                     });
             },
 
+            getIconPath(icon) {
+                if(icon != "" && icon != null) {
+                    return "/files/icons/" + icon;
+                } else {
+                    return "";
+                }
+            },
+
             viewPackage(pkg) {
                 var contents = this.plistParse(pkg.content);
-
             },
 
             plistParse(contents) {
