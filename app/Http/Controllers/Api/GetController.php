@@ -86,6 +86,7 @@ class GetController extends Controller
                 $obj->parse($contents);
 
                 $category = $obj->getValue(true)->category;
+                $categories[] = "All";
                 if(is_null($category)) {
                     $categories[] = "Uncategorized";
                 } else {
@@ -132,6 +133,7 @@ class GetController extends Controller
                 $obj->parse($contents);
 
                 $developer = $obj->getValue(true)->developer;
+                $developers[] = "All";
                 if(is_null($developer)) {
                     $developers[] = "Unknown";
                 } else {

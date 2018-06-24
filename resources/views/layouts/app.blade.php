@@ -9,6 +9,10 @@
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
         <title>{{ $title }} | {{ env('APP_NAME') }}</title>
+
+        <script>
+            window.laravel = {!! json_encode([ 'app_url' => url('/'), 'csrf_token' => csrf_token() ]) !!}
+        </script>
     </head>
     <body>
         <div id="app">

@@ -1720,6 +1720,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     ready: function ready() {
@@ -1733,8 +1762,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             packages: [],
             developer: "",
             category: "",
+            current_package: {},
             categories: [],
-            developers: []
+            developers: [],
+            loading: true
         };
     },
 
@@ -1745,52 +1776,67 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.getCategories();
             this.getDevelopers();
         },
+        cancelEdits: function cancelEdits() {
+            this.current_package = {};
+        },
         applyDeveloper: function applyDeveloper(developer) {
             this.developer = developer;
-            if (developer == "") {
-                this.getPackages();
+            if (developer == "All") {
+                $(".package").show();
             } else {
-                this.getPackages({ type: "developer", value: developer });
+                $(".package").hide();
+                $(".package[data-developer='" + developer + "']").show();
             }
+            this.backToTop();
         },
         applyCategory: function applyCategory(category) {
             this.category = category;
-            if (category == "") {
-                this.getPackages();
+            if (category == "All") {
+                $(".package").show();
             } else {
-                this.getPackages({ type: "category", value: category });
+                $(".package").hide();
+                $(".package[data-category='" + category + "']").show();
             }
+            this.backToTop();
+        },
+        backToTop: function backToTop() {
+            $('html,body').animate({
+                scrollTop: 0
+            }, "fast");
         },
         getCategories: function getCategories() {
             var _this = this;
 
-            axios.get('/api/v1/categories').then(function (response) {
+            axios.get(window.laravel.app_url + '/api/v1/categories').then(function (response) {
                 _this.categories = response.data;
             });
         },
         getDevelopers: function getDevelopers() {
             var _this2 = this;
 
-            axios.get('/api/v1/developers').then(function (response) {
+            axios.get(window.laravel.app_url + '/api/v1/developers').then(function (response) {
                 _this2.developers = response.data;
             });
         },
         getPackages: function getPackages(query) {
             var _this3 = this;
 
-            axios.get('/api/v1/packages-info/content').then(function (response) {
+            axios.get(window.laravel.app_url + '/api/v1/packages-info/content').then(function (response) {
                 _this3.packages = response.data;
+                _this3.loading = false;
             });
         },
         getIconPath: function getIconPath(icon) {
             if (icon != "" && icon != null) {
-                return "/files/icons/" + icon;
+                return window.laravel.app_url + "/files/icons/" + icon;
             } else {
-                return "";
+                return window.laravel.app_url + "/images/no-icon.png";
             }
         },
         viewPackage: function viewPackage(pkg) {
             var contents = this.plistParse(pkg.content);
+            this.current_package = contents;
+            $("#view-package-modal").modal();
         },
         plistParse: function plistParse(contents) {
             return plist.parse(contents);
@@ -55557,32 +55603,45 @@ var render = function() {
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-md-3" }, [
         _c("div", { staticClass: "card" }, [
-          _c("h5", { staticClass: "card-header" }, [_vm._v("Developers")]),
+          _c("h5", { staticClass: "card-header card-header-sm" }, [
+            _vm._v("Developers")
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _c(
               "div",
               { staticClass: "list-group" },
-              _vm._l(_vm.developers, function(developer) {
-                return _c(
-                  "button",
-                  {
-                    staticClass: "list-group-item",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        _vm.applyDeveloper(developer)
-                      }
-                    }
-                  },
-                  [
-                    _c("span", { staticClass: "fa fa-user" }),
-                    _vm._v(
-                      " " + _vm._s(developer) + "\n                        "
-                    )
-                  ]
-                )
-              })
+              [
+                _vm.loading
+                  ? _c("div", { staticClass: "list-group-item" }, [
+                      _vm._v(
+                        "\n                            Loading...\n                        "
+                      )
+                    ])
+                  : _vm._l(_vm.developers, function(developer) {
+                      return _c(
+                        "button",
+                        {
+                          staticClass: "list-group-item developer",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.applyDeveloper(developer)
+                            }
+                          }
+                        },
+                        [
+                          _c("span", { staticClass: "fa fa-user" }),
+                          _vm._v(
+                            " " +
+                              _vm._s(developer) +
+                              "\n                        "
+                          )
+                        ]
+                      )
+                    })
+              ],
+              2
             )
           ])
         ]),
@@ -55590,32 +55649,45 @@ var render = function() {
         _c("br"),
         _vm._v(" "),
         _c("div", { staticClass: "card" }, [
-          _c("h5", { staticClass: "card-header" }, [_vm._v("Categories")]),
+          _c("h5", { staticClass: "card-header card-header-sm" }, [
+            _vm._v("Categories")
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _c(
               "div",
               { staticClass: "list-group" },
-              _vm._l(_vm.categories, function(category) {
-                return _c(
-                  "button",
-                  {
-                    staticClass: "list-group-item",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        _vm.applyCategory(category)
-                      }
-                    }
-                  },
-                  [
-                    _c("span", { staticClass: "fa fa-tag" }),
-                    _vm._v(
-                      " " + _vm._s(category) + "\n                        "
-                    )
-                  ]
-                )
-              })
+              [
+                _vm.loading
+                  ? _c("div", { staticClass: "list-group-item" }, [
+                      _vm._v(
+                        "\n                            Loading...\n                        "
+                      )
+                    ])
+                  : _vm._l(_vm.categories, function(category) {
+                      return _c(
+                        "button",
+                        {
+                          staticClass: "list-group-item category",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.applyCategory(category)
+                            }
+                          }
+                        },
+                        [
+                          _c("span", { staticClass: "fa fa-tag" }),
+                          _vm._v(
+                            " " +
+                              _vm._s(category) +
+                              "\n                        "
+                          )
+                        ]
+                      )
+                    })
+              ],
+              2
             )
           ])
         ])
@@ -55628,59 +55700,154 @@ var render = function() {
             _vm._v(" "),
             _c(
               "tbody",
-              _vm._l(_vm.packages, function(pkg) {
-                return _c(
-                  "tr",
-                  {
-                    staticClass: "clickable-row",
-                    on: {
-                      click: function($event) {
-                        _vm.viewPackage(pkg)
-                      }
-                    }
-                  },
-                  [
-                    _c("td", [
-                      _c("img", {
-                        staticClass: "package-icon",
-                        attrs: {
-                          src: _vm.getIconPath(
-                            _vm.plistParse(pkg.content).icon_name
-                          ),
-                          alt: "icon"
-                        }
-                      })
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(_vm._s(_vm.plistParse(pkg.content).name))
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(_vm._s(_vm.plistParse(pkg.content).display_name))
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(_vm._s(_vm.plistParse(pkg.content).version))
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(
-                        _vm._s(
-                          _vm.dateParse(
-                            _vm.plistParse(pkg.content)._metadata.creation_date
-                          )
-                        )
-                      )
+              [
+                _vm.loading
+                  ? _c("tr", [
+                      _c("td", { attrs: { colspan: "5" } }, [
+                        _vm._v("Loading Packages...")
+                      ])
                     ])
-                  ]
-                )
-              })
+                  : _vm._l(_vm.packages, function(pkg) {
+                      return _c(
+                        "tr",
+                        {
+                          staticClass: "clickable-row package",
+                          attrs: {
+                            "data-category": _vm.plistParse(pkg.content)
+                              .category,
+                            "data-developer": _vm.plistParse(pkg.content)
+                              .developer
+                          },
+                          on: {
+                            click: function($event) {
+                              _vm.viewPackage(pkg)
+                            }
+                          }
+                        },
+                        [
+                          _c("td", [
+                            _c("img", {
+                              staticClass: "package-icon",
+                              attrs: {
+                                src: _vm.getIconPath(
+                                  _vm.plistParse(pkg.content).icon_name
+                                ),
+                                alt: "icon"
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.plistParse(pkg.content).name))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.plistParse(pkg.content).display_name)
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.plistParse(pkg.content).version))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.dateParse(
+                                  _vm.plistParse(pkg.content)._metadata
+                                    .creation_date
+                                )
+                              )
+                            )
+                          ])
+                        ]
+                      )
+                    })
+              ],
+              2
             )
           ])
         ])
       ])
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal modal-lg fade",
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          id: "view-package-modal",
+          "data-backdrop": "static",
+          "data-keyboard": "false"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-lg modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content modal-dialog-lg" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h5", { staticClass: "modal-title" }, [
+                  _vm._v(_vm._s(_vm.current_package.name))
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: {
+                      type: "button",
+                      "data-dismiss": "modal",
+                      "aria-label": "Close"
+                    },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelEdits()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelEdits()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-times" }),
+                    _vm._v(" Cancel")
+                  ]
+                ),
+                _vm._v(" "),
+                _vm._m(1)
+              ])
+            ])
+          ]
+        )
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -55697,6 +55864,16 @@ var staticRenderFns = [
         _c("th", [_vm._v("Modified")])
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      { staticClass: "btn btn-success", attrs: { type: "button" } },
+      [_c("span", { staticClass: "fa fa-check" }), _vm._v(" Save Changes")]
+    )
   }
 ]
 render._withStripped = true

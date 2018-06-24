@@ -10435,10 +10435,24 @@ button.list-group-item:hover {
 }
 
 .package-icon {
-  max-width: 75px;
+  max-width: 35px;
 }
 
 td {
   vertical-align: middle !important;
+}
+
+.card-header-sm {
+  font-size: 1em;
+}
+
+.modal-lg {
+  width: 100%;
+  max-width: none;
+}
+
+.modal-dialog-lg {
+  width: 90%;
+  margin: 0 auto;
 }
 
