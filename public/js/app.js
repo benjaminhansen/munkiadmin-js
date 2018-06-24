@@ -1698,6 +1698,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     ready: function ready() {
@@ -1710,6 +1732,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             packages: [],
             catalogs: [],
+            new_catalog: {
+                name: ""
+            },
             current_catalog: {},
             loading: true
         };
@@ -1743,6 +1768,37 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this2.catalogs = response.data;
                 _this2.loading = false;
             });
+        },
+        addNewCatalog: function addNewCatalog() {
+            $("#new-catalog-modal").modal();
+        },
+        cancelNewCatalog: function cancelNewCatalog() {
+            this.new_catalog = {
+                name: ""
+            };
+        },
+        closeNewCatalogModal: function closeNewCatalogModal() {
+            $('#new-catalog-modal').modal('hide');
+        },
+        createNewCatalog: function createNewCatalog() {
+            var _this3 = this;
+
+            var catalog_name = this.new_catalog.name.trim();
+            if (catalog_name) {
+                axios.post(window.laravel.app_url + "/api/v1/new-catalog", {
+                    name: catalog_name
+                }).then(function (response) {
+                    if (response.data.success) {
+                        _this3.cancelNewCatalog();
+                        _this3.getCatalogs();
+                        _this3.closeNewCatalogModal();
+                    } else {
+                        alert(response.data.message);
+                    }
+                });
+            } else {
+                alert("A name is required to create a new catalog!");
+            }
         },
         cancelEdits: function cancelEdits() {
             if (this.current_catalog.changes_made) {
@@ -1792,8 +1848,68 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+    ready: function ready() {
+        this.prepare();
+    },
+    mounted: function mounted() {
+        this.prepare();
+    },
+    data: function data() {
+        return {
+            manifests: [],
+            loading: true
+        };
+    },
+
+
+    methods: {
+        prepare: function prepare() {
+            this.getManifests();
+        },
+        getManifests: function getManifests() {
+            var _this = this;
+
+            axios.get(window.laravel.app_url + "/api/v1/manifests/content").then(function (response) {
+                if (response.data.success == null || response.data.success != false) {
+                    _this.manifests = response.data;
+                    _this.loading = false;
+                    console.log(_this.plistParse(_this.manifests[0].content));
+                } else {
+                    alert(response.data.message);
+                }
+            });
+        },
+        viewManifest: function viewManifest(manifest) {},
+        plistParse: function plistParse(contents) {
+            return plist.parse(contents);
+        },
+        dateParse: function dateParse(date) {
+            return moment(date).format('MMMM Do YYYY, h:mm:ss a');
+        }
+    }
+});
 
 /***/ }),
 
@@ -1940,22 +2056,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var _this = this;
 
             axios.get(window.laravel.app_url + '/api/v1/categories').then(function (response) {
-                _this.categories = response.data;
+                if (response.data.success == null || response.data.success != false) {
+                    _this.categories = response.data;
+                }
             });
         },
         getDevelopers: function getDevelopers() {
             var _this2 = this;
 
             axios.get(window.laravel.app_url + '/api/v1/developers').then(function (response) {
-                _this2.developers = response.data;
+                if (response.data.success == null || response.data.success != false) {
+                    _this2.developers = response.data;
+                }
             });
         },
         getPackages: function getPackages(query) {
             var _this3 = this;
 
             axios.get(window.laravel.app_url + '/api/v1/packages-info/content').then(function (response) {
-                _this3.packages = response.data;
-                _this3.loading = false;
+                if (response.data.success == null || response.data.success != false) {
+                    _this3.packages = response.data;
+                    _this3.loading = false;
+                } else {
+                    _this3.loading = false;
+                    alert(response.data.message);
+                }
             });
         },
         getIconPath: function getIconPath(icon) {
@@ -55742,7 +55867,7 @@ var render = function() {
           _c("div", { staticClass: "card-body" }, [
             _c(
               "div",
-              { staticClass: "list-group" },
+              { staticClass: "list-group list-group-sm" },
               [
                 _vm.loading
                   ? _c("div", { staticClass: "list-group-item" }, [
@@ -55788,7 +55913,7 @@ var render = function() {
           _c("div", { staticClass: "card-body" }, [
             _c(
               "div",
-              { staticClass: "list-group" },
+              { staticClass: "list-group list-group-sm" },
               [
                 _vm.loading
                   ? _c("div", { staticClass: "list-group-item" }, [
@@ -55827,79 +55952,85 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "col-md-9" }, [
         _c("div", { staticClass: "table-responsive" }, [
-          _c("table", { staticClass: "table table-striped table-hover" }, [
-            _vm._m(0),
-            _vm._v(" "),
-            _c(
-              "tbody",
-              [
-                _vm.loading
-                  ? _c("tr", [
-                      _c("td", { attrs: { colspan: "5" } }, [
-                        _vm._v("Loading Packages...")
+          _c(
+            "table",
+            { staticClass: "table table-striped table-hover table-sm" },
+            [
+              _vm._m(0),
+              _vm._v(" "),
+              _c(
+                "tbody",
+                [
+                  _vm.loading
+                    ? _c("tr", [
+                        _c("td", { attrs: { colspan: "5" } }, [
+                          _vm._v("Loading Packages...")
+                        ])
                       ])
-                    ])
-                  : _vm._l(_vm.packages, function(pkg) {
-                      return _c(
-                        "tr",
-                        {
-                          staticClass: "clickable-row package",
-                          attrs: {
-                            "data-category": _vm.plistParse(pkg.content)
-                              .category,
-                            "data-developer": _vm.plistParse(pkg.content)
-                              .developer
-                          },
-                          on: {
-                            click: function($event) {
-                              _vm.viewPackage(pkg)
-                            }
-                          }
-                        },
-                        [
-                          _c("td", [
-                            _c("img", {
-                              staticClass: "package-icon",
-                              attrs: {
-                                src: _vm.getIconPath(
-                                  _vm.plistParse(pkg.content).icon_name
-                                ),
-                                alt: "icon"
+                    : _vm._l(_vm.packages, function(pkg) {
+                        return _c(
+                          "tr",
+                          {
+                            staticClass: "clickable-row package",
+                            attrs: {
+                              "data-category": _vm.plistParse(pkg.content)
+                                .category,
+                              "data-developer": _vm.plistParse(pkg.content)
+                                .developer
+                            },
+                            on: {
+                              click: function($event) {
+                                _vm.viewPackage(pkg)
                               }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.plistParse(pkg.content).name))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.plistParse(pkg.content).display_name)
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.plistParse(pkg.content).version))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.dateParse(
-                                  _vm.plistParse(pkg.content)._metadata
-                                    .creation_date
+                            }
+                          },
+                          [
+                            _c("td", [
+                              _c("img", {
+                                staticClass: "package-icon",
+                                attrs: {
+                                  src: _vm.getIconPath(
+                                    _vm.plistParse(pkg.content).icon_name
+                                  ),
+                                  alt: "icon"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.plistParse(pkg.content).name))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(
+                                _vm._s(_vm.plistParse(pkg.content).display_name)
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(
+                                _vm._s(_vm.plistParse(pkg.content).version)
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(
+                                _vm._s(
+                                  _vm.dateParse(
+                                    _vm.plistParse(pkg.content)._metadata
+                                      .creation_date
+                                  )
                                 )
                               )
-                            )
-                          ])
-                        ]
-                      )
-                    })
-              ],
-              2
-            )
-          ])
+                            ])
+                          ]
+                        )
+                      })
+                ],
+                2
+              )
+            ]
+          )
         ])
       ])
     ]),
@@ -56027,8 +56158,24 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
+    _c("p", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-success btn-sm",
+          attrs: { type: "button" },
+          on: {
+            click: function($event) {
+              _vm.addNewCatalog()
+            }
+          }
+        },
+        [_c("span", { staticClass: "fa fa-plus" }), _vm._v(" Add New Catalog")]
+      )
+    ]),
+    _vm._v(" "),
     _c("div", { staticClass: "table-responsive" }, [
-      _c("table", { staticClass: "table table-striped table-hover" }, [
+      _c("table", { staticClass: "table table-striped table-hover table-sm" }, [
         _vm._m(0),
         _vm._v(" "),
         _c(
@@ -56036,7 +56183,9 @@ var render = function() {
           [
             _vm.loading
               ? _c("tr", [
-                  _c("td", { attrs: { colspan: "2" } }, [_vm._v("Loading...")])
+                  _c("td", { attrs: { colspan: "2" } }, [
+                    _vm._v("Loading Catalogs...")
+                  ])
                 ])
               : _vm._l(_vm.catalogs, function(catalog) {
                   return _c(
@@ -56087,7 +56236,11 @@ var render = function() {
             _c("div", { staticClass: "modal-content modal-dialog-lg" }, [
               _c("div", { staticClass: "modal-header" }, [
                 _c("h5", { staticClass: "modal-title" }, [
-                  _vm._v(_vm._s(_vm.current_catalog.name) + " Catalog")
+                  _vm._v(
+                    "Packages Assigned to the " +
+                      _vm._s(_vm.current_catalog.name) +
+                      " Catalog"
+                  )
                 ]),
                 _vm._v(" "),
                 _c(
@@ -56115,7 +56268,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "table-responsive" }, [
-                  _c("table", { staticClass: "table table-striped" }, [
+                  _c("table", { staticClass: "table table-striped table-sm" }, [
                     _vm._m(1),
                     _vm._v(" "),
                     _c(
@@ -56200,6 +56353,122 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal modal-lg fade",
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          id: "new-catalog-modal",
+          "data-backdrop": "static",
+          "data-keyboard": "false"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-lg modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content modal-dialog-lg" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h5", { staticClass: "modal-title" }, [
+                  _vm._v("Create New Catalog")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: {
+                      type: "button",
+                      "data-dismiss": "modal",
+                      "aria-label": "Close"
+                    },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelNewCatalog()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("label", [_vm._v("Catalog Name")]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.new_catalog.name,
+                      expression: "new_catalog.name"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text" },
+                  domProps: { value: _vm.new_catalog.name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.new_catalog, "name", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelNewCatalog()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-times" }),
+                    _vm._v(" Cancel")
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.createNewCatalog()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-check" }),
+                    _vm._v(" Create Catalog")
+                  ]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -56248,9 +56517,88 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div")
+  return _c("div", [
+    _c("div", { staticClass: "table-responsive" }, [
+      _c("table", { staticClass: "table table-striped table-hover table-sm" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "tbody",
+          [
+            _vm.loading
+              ? _c("tr", [
+                  _c("td", { attrs: { colspan: "3" } }, [
+                    _vm._v("Loading Manifests...")
+                  ])
+                ])
+              : _vm._l(_vm.manifests, function(manifest) {
+                  return _c(
+                    "tr",
+                    {
+                      staticClass: "clickable-row",
+                      on: {
+                        click: function($event) {
+                          _vm.viewManifest(manifest)
+                        }
+                      }
+                    },
+                    [
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.plistParse(manifest.content).display_name !=
+                            null
+                              ? _vm.plistParse(manifest.content).display_name
+                              : manifest.file.split("/")[
+                                  manifest.file.split("/").length - 1
+                                ]
+                          )
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.plistParse(manifest.content).catalogs.join(", ")
+                          )
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            manifest.file.split("/")[
+                              manifest.file.split("/").length - 1
+                            ]
+                          )
+                        )
+                      ])
+                    ]
+                  )
+                })
+          ],
+          2
+        )
+      ])
+    ])
+  ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Catalogs")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Filename")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {

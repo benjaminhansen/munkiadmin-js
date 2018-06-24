@@ -14,6 +14,7 @@
 Route::group(['prefix' => 'api/v1'], function(){
     Route::get('manifests/{content?}', 'Api\\GetController@manifests');
     Route::get('catalogs/{content?}', 'Api\\GetController@catalogs');
+    Route::post('new-catalog', 'Api\\PostController@new_catalog');
     Route::get('icons', 'Api\\GetController@icons');
     Route::get('packages', 'Api\\GetController@packages');
     Route::get('packages-info/{content?}', 'Api\\GetController@packagesInfo');

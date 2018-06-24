@@ -5,7 +5,7 @@
                 <div class="card">
                     <h5 class="card-header card-header-sm">Developers</h5>
                     <div class="card-body">
-                        <div class="list-group">
+                        <div class="list-group list-group-sm">
                             <div class="list-group-item" v-if="loading">
                                 Loading...
                             </div>
@@ -19,7 +19,7 @@
                 <div class="card">
                     <h5 class="card-header card-header-sm">Categories</h5>
                     <div class="card-body">
-                        <div class="list-group">
+                        <div class="list-group list-group-sm">
                             <div class="list-group-item" v-if="loading">
                                 Loading...
                             </div>
@@ -32,7 +32,7 @@
             </div>
             <div class="col-md-9">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover table-sm">
                         <thead>
                             <tr>
                                 <th></th><th>Name</th><th>Display Name</th><th>Version</th><th>Modified</th>
@@ -141,22 +141,31 @@
             getCategories() {
                 axios.get(window.laravel.app_url + '/api/v1/categories')
                     .then(response => {
-                        this.categories = response.data;
+                        if(response.data.success == null || response.data.success != false) {
+                            this.categories = response.data;
+                        }
                     });
             },
 
             getDevelopers() {
                 axios.get(window.laravel.app_url + '/api/v1/developers')
                     .then(response => {
-                        this.developers = response.data;
+                        if(response.data.success == null || response.data.success != false) {
+                            this.developers = response.data;
+                        }
                     });
             },
 
             getPackages(query) {
                 axios.get(window.laravel.app_url + '/api/v1/packages-info/content')
                     .then(response => {
-                        this.packages = response.data;
-                        this.loading = false;
+                        if(response.data.success == null || response.data.success != false) {
+                            this.packages = response.data;
+                            this.loading = false;
+                        } else {
+                            this.loading = false;
+                            alert(response.data.message);
+                        }
                     });
             },
 

@@ -1,7 +1,8 @@
 <template>
     <div>
+        <p><button type="button" @click="addNewCatalog()" class="btn btn-success btn-sm"><span class="fa fa-plus"></span> Add New Catalog</button></p>
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-sm">
                 <thead>
                     <tr>
                         <th>Name</th><th># of Assigned Packages</th>
@@ -9,7 +10,7 @@
                 </thead>
                 <tbody>
                     <tr v-if="loading">
-                        <td colspan="2">Loading...</td>
+                        <td colspan="2">Loading Catalogs...</td>
                     </tr>
                     <tr v-else v-for="catalog in catalogs" class="clickable-row" @click="viewCatalog(catalog)">
                         <td>{{ catalog.file.split('/')[1] }}</td>
@@ -23,14 +24,14 @@
           <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content modal-dialog-lg">
               <div class="modal-header">
-                <h5 class="modal-title">{{ current_catalog.name }} Catalog</h5>
+                <h5 class="modal-title">Packages Assigned to the {{ current_catalog.name }} Catalog</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="cancelEdits()">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
               <div class="modal-body">
                   <div class="table-responsive">
-                      <table class="table table-striped">
+                      <table class="table table-striped table-sm">
                           <thead>
                               <tr>
                                   <th></th><th>Name</th><th>Display Name</th><th>Version</th><th></th>
@@ -55,6 +56,27 @@
             </div>
           </div>
         </div>
+
+        <div class="modal modal-lg fade" tabindex="-1" role="dialog" id="new-catalog-modal" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content modal-dialog-lg">
+              <div class="modal-header">
+                <h5 class="modal-title">Create New Catalog</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="cancelNewCatalog()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <label>Catalog Name</label>
+                  <input type="text" class="form-control" v-model="new_catalog.name">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="cancelNewCatalog()" data-dismiss="modal"><span class="fa fa-times"></span> Cancel</button>
+                <button type="button" class="btn btn-success" @click="createNewCatalog()"><span class="fa fa-check"></span> Create Catalog</button>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </template>
 
@@ -72,6 +94,9 @@
             return {
                 packages: [],
                 catalogs:[],
+                new_catalog: {
+                    name:""
+                },
                 current_catalog: {},
                 loading:true
             };
@@ -105,6 +130,39 @@
                         this.catalogs = response.data;
                         this.loading = false;
                     });
+            },
+
+            addNewCatalog() {
+                $("#new-catalog-modal").modal();
+            },
+
+            cancelNewCatalog() {
+                this.new_catalog = {
+                    name:""
+                };
+            },
+
+            closeNewCatalogModal() {
+                $('#new-catalog-modal').modal('hide');
+            },
+
+            createNewCatalog() {
+                var catalog_name = this.new_catalog.name.trim();
+                if(catalog_name) {
+                    axios.post(window.laravel.app_url + "/api/v1/new-catalog", {
+                        name:catalog_name
+                    }).then(response => {
+                        if(response.data.success) {
+                            this.cancelNewCatalog();
+                            this.getCatalogs();
+                            this.closeNewCatalogModal();
+                        } else {
+                            alert(response.data.message);
+                        }
+                    });
+                } else {
+                    alert("A name is required to create a new catalog!");
+                }
             },
 
             cancelEdits() {
