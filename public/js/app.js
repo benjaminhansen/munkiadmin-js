@@ -1644,8 +1644,140 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+    ready: function ready() {
+        this.prepare();
+    },
+    mounted: function mounted() {
+        this.prepare();
+    },
+    data: function data() {
+        return {
+            packages: [],
+            catalogs: [],
+            current_catalog: {},
+            loading: true
+        };
+    },
+
+
+    methods: {
+        prepare: function prepare() {
+            this.getPackages();
+            this.getCatalogs();
+        },
+        getPackages: function getPackages(query) {
+            var _this = this;
+
+            axios.get(window.laravel.app_url + '/api/v1/packages-info/content').then(function (response) {
+                _this.packages = response.data;
+            });
+        },
+        getIconPath: function getIconPath(icon) {
+            if (icon != "" && icon != null) {
+                return window.laravel.app_url + "/files/icons/" + icon;
+            } else {
+                return window.laravel.app_url + "/images/no-icon.png";
+            }
+        },
+        getCatalogs: function getCatalogs() {
+            var _this2 = this;
+
+            this.loading = true;
+            axios.get(window.laravel.app_url + "/api/v1/catalogs/content").then(function (response) {
+                _this2.catalogs = response.data;
+                _this2.loading = false;
+            });
+        },
+        cancelEdits: function cancelEdits() {
+            if (this.current_catalog.changes_made) {
+                if (confirm("Are you sure?\nYou have unsaved changes that will be lost!")) {
+                    this.current_catalog = {};
+                }
+            } else {
+                this.current_catalog = {};
+            }
+        },
+        saveEdits: function saveEdits() {},
+        viewCatalog: function viewCatalog(catalog) {
+            var parsed = this.plistParse(catalog.content);
+            this.current_catalog = {
+                name: catalog.file.split('/')[1],
+                data: parsed,
+                changes_made: false
+            };
+            $("#view-catalog-modal").modal();
+        },
+        removeFromCatalog: function removeFromCatalog(pkg) {
+            if (confirm("Are you sure?")) {
+                var indexOf = this.current_catalog.data.indexOf(pkg);
+                this.current_catalog.data.splice(indexOf, 1);
+                this.current_catalog.changes_made = true;
+            }
+        },
+        plistParse: function plistParse(contents) {
+            return plist.parse(contents);
+        },
+        dateParse: function dateParse(date) {
+            return moment(date).format('MMMM Do YYYY, h:mm:ss a');
+        }
+    }
+});
 
 /***/ }),
 
@@ -55894,9 +56026,210 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div")
+  return _c("div", [
+    _c("div", { staticClass: "table-responsive" }, [
+      _c("table", { staticClass: "table table-striped table-hover" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "tbody",
+          [
+            _vm.loading
+              ? _c("tr", [
+                  _c("td", { attrs: { colspan: "2" } }, [_vm._v("Loading...")])
+                ])
+              : _vm._l(_vm.catalogs, function(catalog) {
+                  return _c(
+                    "tr",
+                    {
+                      staticClass: "clickable-row",
+                      on: {
+                        click: function($event) {
+                          _vm.viewCatalog(catalog)
+                        }
+                      }
+                    },
+                    [
+                      _c("td", [_vm._v(_vm._s(catalog.file.split("/")[1]))]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm.plistParse(catalog.content).length))
+                      ])
+                    ]
+                  )
+                })
+          ],
+          2
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal modal-lg fade",
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          id: "view-catalog-modal",
+          "data-backdrop": "static",
+          "data-keyboard": "false"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-lg modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content modal-dialog-lg" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h5", { staticClass: "modal-title" }, [
+                  _vm._v(_vm._s(_vm.current_catalog.name) + " Catalog")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: {
+                      type: "button",
+                      "data-dismiss": "modal",
+                      "aria-label": "Close"
+                    },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelEdits()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "table-responsive" }, [
+                  _c("table", { staticClass: "table table-striped" }, [
+                    _vm._m(1),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.current_catalog.data, function(pkg) {
+                        return _c("tr", [
+                          _c("td", [
+                            _c("img", {
+                              staticClass: "package-icon",
+                              attrs: {
+                                src: _vm.getIconPath(pkg.icon_name),
+                                alt: "icon"
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(pkg.name))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(pkg.display_name))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(pkg.version))]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-sm btn-danger",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.removeFromCatalog(pkg)
+                                  }
+                                }
+                              },
+                              [_vm._v("Remove From Catalog")]
+                            )
+                          ])
+                        ])
+                      })
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelEdits()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-times" }),
+                    _vm._v(" Cancel")
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-success",
+                    class: { disabled: !_vm.current_catalog.changes_made },
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.saveEdits()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-check" }),
+                    _vm._v(" Save Changes")
+                  ]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    )
+  ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Name")]),
+        _c("th", [_vm._v("# of Assigned Packages")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th"),
+        _c("th", [_vm._v("Name")]),
+        _c("th", [_vm._v("Display Name")]),
+        _c("th", [_vm._v("Version")]),
+        _c("th")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
