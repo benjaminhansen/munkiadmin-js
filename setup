@@ -1,31 +1,144 @@
 #!/usr/bin/env php
 <?php
 
-$composer = trim(shell_exec("which composer"));
-if($composer == "") {
+function repoType() {
+    $repo_type = trim(shell_exec('read -p "Repo Type [local,remote]: " repo_type; echo $repo_type;'));
+    if(!in_array($repo_type, ['local', 'remote'])) {
+        echo "Invalid selection. Please try again.\n";
+        repoType();
+    } else {
+        if($repo_type == "remote") {
+            return "sftp";
+        } else {
+            return "local";
+        }
+    }
+}
+
+function osVersion() {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        return "where";
+    } else {
+        return "which";
+    }
+}
+
+$which = osVersion();
+
+$composer = trim(shell_exec("$which composer"));
+if($composer == "" || strpos($composer, 'INFO: Could not find files') !== false) {
     die("composer is required to continue!\n");
 }
 
-$npm = trim(shell_exec("which npm"));
-if($npm == "") {
+$npm = trim(shell_exec("$which npm"));
+if($npm == "" || strpos($npm, 'INFO: Could not find files') !== false) {
     die("npm is required to continue!\n");
 }
 
 $dir = __DIR__;
+if(!is_writable($dir)) {
+    die("The directory [$dir] must be writable by the server in order to continue.\n");
+}
 
-echo "Copy .env\n";
-$copy_env = file_exists($dir.'/.env') || copy($dir.'/.env.example', $dir.'/.env');
+$result = [];
 
-echo "Generate Laravel App Key\n";
-$key_gen = shell_exec("cd $dir && php artisan key:generate");
+$file = "$dir/setup_results.json";
+if(!is_writable($file)) {
+    die("The file [$file] must be writable by the server in order to continue.\n");
+}
 
-echo "Install composer dependencies\n";
-$run_composer = shell_exec("cd $dir && composer install");
+$setup = json_decode(file_get_contents($file));
 
-echo "Install npm dependencies and generate prod files\n";
-$run_npm = shell_exec("cd $dir && npm install && npm run prod");
+try {
+    if($setup->env_created) {
+        echo ".env already copied\n";
+        $result['env_created'] = true;
+    } else {
+        echo "Copy .env\n";
+        $copy_env = file_exists($dir.'/.env') || copy($dir.'/.env.example', $dir.'/.env');
+        $result['env_created'] = true;
+    }
 
-echo "Regenerate autoload files\n";
-$dump_autoload = shell_exec("cd $dir && composer dump-autoload");
+    if($setup->key_generated) {
+        echo "App Key already generated.\n";
+        $result['key_generated'] = true;
+    } else {
+        echo "Generate Laravel App Key\n";
+        $key_gen = shell_exec("cd $dir && php artisan key:generate");
+        $result['key_generated'] = true;
+    }
 
-echo "Configuration complete\n";
+    if($setup->composer_deps_installed) {
+        echo "Composer dependencies already installed.\n";
+        $result['composer_deps_installed'] = true;
+    } else {
+        echo "Install composer dependencies\n";
+        $run_composer = shell_exec("cd $dir && composer install");
+        $result['composer_deps_installed'] = true;
+    }
+
+    if($setup->npm_deps_installed) {
+        echo "NPM dependencies already installed.\n";
+        $result['npm_deps_installed'] = true;
+    } else {
+        echo "Install npm dependencies and generate prod files\n";
+        $run_npm = shell_exec("cd $dir && npm install && npm run prod");
+        $result['npm_deps_installed'] = true;
+    }
+
+    if($setup->autoload_dumped) {
+        echo "Autoload files already regenerated.\n";
+        $result['autoload_dumped'] = true;
+    } else {
+        echo "Regenerate autoload files\n";
+        $dump_autoload = shell_exec("cd $dir && composer dump-autoload");
+        $result['autoload_dumped'] = true;
+    }
+
+    $env_contents = file_get_contents($dir.'/.env');
+
+    if($setup->repo_type) {
+        echo "Repo type already set.\n";
+        $result['repo_type'] = true;
+    } else {
+        // repo type local or remote
+        $repo_type = repoType();
+        $env_contents = str_replace("FILESYSTEM_DRIVER=", "FILESYSTEM_DRIVER=$repo_type", $env_contents);
+        $result['repo_type'] = true;
+    }
+
+    if($setup->repo_path) {
+        echo "Repo path has already been set.\n";
+        $result['repo_path'] = true;
+    } else {
+        // repo path
+        $repo_path = trim(shell_exec('read -p "Repo Path [/munki/repo]: " repo_path; echo $repo_path;'));
+        $env_contents = str_replace("MUNKI_REPO_PATH=", "MUNKI_REPO_PATH=$repo_path", $env_contents);
+        $result['repo_path'] = true;
+    }
+
+    if($setup->repo_connection) {
+        echo "Repo connection has already been set.\n";
+        $result['repo_connection'] = true;
+    } else {
+        // if sftp, we need credentials
+        if($repo_type == "sftp") {
+            // get username, password, and host
+            $repo_host = trim(shell_exec('read -p "Repo Host [munkihost.local]: " repo_host; echo $repo_host;'));
+            $repo_user = trim(shell_exec('read -p "Repo Username [username]: " repo_user; echo $repo_user;'));
+            $repo_pass = trim(shell_exec('read -p "Repo Password [password]: " repo_pass; echo $repo_pass;'));
+
+            $env_contents = str_replace("SFTP_HOST=", "SFTP_HOST=$repo_host", $env_contents);
+            $env_contents = str_replace("SFTP_USERNAME=", "SFTP_USERNAME=$repo_user", $env_contents);
+            $env_contents = str_replace("SFTP_PASSWORD=", "SFTP_PASSWORD=$repo_pass", $env_contents);
+
+            $result['repo_connection'] = true;
+        }
+    }
+
+    echo "Configuration complete\n";
+
+    file_put_contents($file, json_encode($result));
+} catch(Exception $e) {
+    die($e->getMessage());
+}

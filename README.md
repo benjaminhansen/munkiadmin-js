@@ -1,4 +1,4 @@
-# munkiadmin-js
+# MunkiAdmin-js
 
 Will provide a pure HTML5 management interface for Munki repositories.
 
