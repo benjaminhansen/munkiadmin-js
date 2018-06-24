@@ -1,10 +1,10 @@
 {
-    "env_created":true,
-    "key_generated":true,
-    "composer_deps_installed":true,
-    "npm_deps_installed":true,
-    "autoload_dumped":true,
-    "repo_type":true,
-    "repo_path":true,
-    "repo_connection":true
+    "env_created":false,
+    "key_generated":false,
+    "composer_deps_installed":false,
+    "npm_deps_installed":false,
+    "autoload_dumped":false,
+    "repo_type":false,
+    "repo_path":false,
+    "repo_connection":false
 }
