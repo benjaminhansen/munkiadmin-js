@@ -136,6 +136,8 @@ try {
         }
     }
 
+    file_put_contents($dir.'/.env', $env_contents);
+
     echo "Configuration complete\n";
 
     file_put_contents($file, json_encode($result));
