@@ -45,6 +45,11 @@
                                   <td>{{ pkg.version }}</td>
                                   <td><button type="button" class="btn btn-sm btn-danger" @click="removeFromCatalog(pkg)">Remove From Catalog</button></td>
                               </tr>
+                              <tr>
+                                  <td colspan="5">
+                                      <button type="button" @click="assignNewPackage()" class="btn btn-default btn-sm btn-block"><span class="fa fa-plus"></span> Assign New Package</button>
+                                  </td>
+                              </tr>
                           </tbody>
                       </table>
                   </div>
@@ -73,6 +78,26 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="cancelNewCatalog()" data-dismiss="modal"><span class="fa fa-times"></span> Cancel</button>
                 <button type="button" class="btn btn-success" @click="createNewCatalog()"><span class="fa fa-check"></span> Create Catalog</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal modal-lg fade" tabindex="-1" role="dialog" id="add-pkg-to-catalog-modal" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content modal-dialog-lg">
+              <div class="modal-header">
+                <h5 class="modal-title">Assign Package(s) to {{ current_catalog.name }} Catalog</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="cancelAddPackage()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @click="cancelAddPackage()" data-dismiss="modal"><span class="fa fa-times"></span> Cancel</button>
+                <button type="button" class="btn btn-success" @click="addNewPackage()"><span class="fa fa-check"></span> Assign Package</button>
               </div>
             </div>
           </div>
@@ -176,6 +201,18 @@
             },
 
             saveEdits() {
+
+            },
+
+            assignNewPackage() {
+                $("#add-pkg-to-catalog-modal").modal();
+            },
+
+            cancelAddPackage() {
+
+            },
+
+            addNewPackage() {
 
             },
 

@@ -1720,6 +1720,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     ready: function ready() {
@@ -1810,6 +1835,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         saveEdits: function saveEdits() {},
+        assignNewPackage: function assignNewPackage() {
+            $("#add-pkg-to-catalog-modal").modal();
+        },
+        cancelAddPackage: function cancelAddPackage() {},
+        addNewPackage: function addNewPackage() {},
         viewCatalog: function viewCatalog(catalog) {
             var parsed = this.plistParse(catalog.content);
             this.current_catalog = {
@@ -56273,41 +56303,65 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tbody",
-                      _vm._l(_vm.current_catalog.data, function(pkg) {
-                        return _c("tr", [
-                          _c("td", [
-                            _c("img", {
-                              staticClass: "package-icon",
-                              attrs: {
-                                src: _vm.getIconPath(pkg.icon_name),
-                                alt: "icon"
-                              }
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(pkg.name))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(pkg.display_name))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(pkg.version))]),
-                          _vm._v(" "),
-                          _c("td", [
+                      [
+                        _vm._l(_vm.current_catalog.data, function(pkg) {
+                          return _c("tr", [
+                            _c("td", [
+                              _c("img", {
+                                staticClass: "package-icon",
+                                attrs: {
+                                  src: _vm.getIconPath(pkg.icon_name),
+                                  alt: "icon"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(pkg.name))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(pkg.display_name))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(pkg.version))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-sm btn-danger",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.removeFromCatalog(pkg)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Remove From Catalog")]
+                              )
+                            ])
+                          ])
+                        }),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("td", { attrs: { colspan: "5" } }, [
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-sm btn-danger",
+                                staticClass: "btn btn-default btn-sm btn-block",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
-                                    _vm.removeFromCatalog(pkg)
+                                    _vm.assignNewPackage()
                                   }
                                 }
                               },
-                              [_vm._v("Remove From Catalog")]
+                              [
+                                _c("span", { staticClass: "fa fa-plus" }),
+                                _vm._v(" Assign New Package")
+                              ]
                             )
                           ])
                         ])
-                      })
+                      ],
+                      2
                     )
                   ])
                 ])
@@ -56462,6 +56516,102 @@ var render = function() {
                   [
                     _c("span", { staticClass: "fa fa-check" }),
                     _vm._v(" Create Catalog")
+                  ]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal modal-lg fade",
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          id: "add-pkg-to-catalog-modal",
+          "data-backdrop": "static",
+          "data-keyboard": "false"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-lg modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content modal-dialog-lg" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h5", { staticClass: "modal-title" }, [
+                  _vm._v(
+                    "Assign Package(s) to " +
+                      _vm._s(_vm.current_catalog.name) +
+                      " Catalog"
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: {
+                      type: "button",
+                      "data-dismiss": "modal",
+                      "aria-label": "Close"
+                    },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelAddPackage()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                    on: {
+                      click: function($event) {
+                        _vm.cancelAddPackage()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-times" }),
+                    _vm._v(" Cancel")
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.addNewPackage()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { staticClass: "fa fa-check" }),
+                    _vm._v(" Assign Package")
                   ]
                 )
               ])
@@ -72470,7 +72620,15 @@ Vue.component('manifests', __webpack_require__("./resources/assets/js/components
 Vue.component('packages', __webpack_require__("./resources/assets/js/components/Packages.vue"));
 
 var app = new Vue({
-  el: '#app'
+    el: '#app'
+});
+
+$(document).on('show.bs.modal', '.modal', function () {
+    var zIndex = 1040 + 10 * $('.modal:visible').length;
+    $(this).css('z-index', zIndex);
+    setTimeout(function () {
+        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
 });
 
 /***/ }),
